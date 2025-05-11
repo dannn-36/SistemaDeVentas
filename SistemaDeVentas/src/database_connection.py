@@ -24,7 +24,8 @@ class DatabaseConnection:
             print("1. CRUD de Clientes")
             print("2. CRUD de Proovedores")
             print("3. CRUD de Distritos")
-            print("4. CRUD de productos")
+            print("4. CRUD de Productos")
+            print("5. CRUD de Vendedores")
             opcion = input("Seleccione una opción: ")
 
             if opcion == "1":
@@ -42,6 +43,9 @@ class DatabaseConnection:
                 from product_crud import ProductoCRUD
                 ProductoCRUD.menu_crud_productos()
                 break
+            elif opcion == "5":
+                from seller_crud import VendedorCRUD
+                VendedorCRUD.menu_crud_vendedores()
             else:
                 print("Opción inválida. Intente nuevamente.")
 
