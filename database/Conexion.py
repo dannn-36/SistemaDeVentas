@@ -17,3 +17,5 @@ class DatabaseConnection:
         except mysql.connector.Error as error:
             print("Error al conectarse a la base de datos: {}".format(error))
             return None
+
+    conexionBaseDeDatos()
