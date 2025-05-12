@@ -129,7 +129,7 @@ class ClienteCRUD:
                 print(f"Error al actualizar cliente: {e}")
             finally:
                 conexion.close()
-
+#sakdjahskdhj
     @staticmethod
     def eliminar_cliente(cod_cli):
         conexion = DatabaseConnection.conexionBaseDeDatos()
