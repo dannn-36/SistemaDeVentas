@@ -1,5 +1,5 @@
 import mysql.connector
-from database.database_connection import DatabaseConnection
+from SistemaDeVentas.src.database_connection import DatabaseConnection
 
 class VendedorCRUD:
     @staticmethod

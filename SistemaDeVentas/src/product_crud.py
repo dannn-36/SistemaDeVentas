@@ -1,4 +1,4 @@
-from database_connection import DatabaseConnection
+from SistemaDeVentas.src.database_connection import DatabaseConnection
 
 class ProductoCRUD:
     @staticmethod
