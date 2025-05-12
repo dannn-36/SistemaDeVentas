@@ -43,9 +43,11 @@ class ProductoCRUD:
                 ProductoCRUD.eliminar_producto(cod_pro)
 
             elif opcion == "5":
+                print("Volviendo al Menú Principal...")
                 break
             else:
-                print("Opción inválida.")
+                print("Opción inválida. Intente nuevamente.")
+
 
     @staticmethod
     def crear_producto(cod_pro, des_pro, pre_pro, sac_pro, smi_pro, uni_pro, lin_pro, imp_pro):

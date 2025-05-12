@@ -23,6 +23,7 @@ class ProveedorCRUD:
             elif opcion == "4":
                 ProveedorCRUD.eliminar_proveedor()
             elif opcion == "5":
+                print("Volviendo al Menú Principal...")
                 break
             else:
                 print("Opción inválida. Intente nuevamente.")

@@ -26,6 +26,11 @@ class DatabaseConnection:
             print("3. CRUD de Distritos")
             print("4. CRUD de Productos")
             print("5. CRUD de Vendedores")
+            print("6. CRUD de Facturas")
+            print("7. CRUD de Órdenes de Compra")
+            print("8. CRUD de Detalles de Factura")
+            print("9. CRUD de Detalles de Compra")
+            print("10. CRUD de Abastecimientos")
             opcion = input("Seleccione una opción: ")
 
             if opcion == "1":
@@ -46,6 +51,26 @@ class DatabaseConnection:
             elif opcion == "5":
                 from seller_crud import VendedorCRUD
                 VendedorCRUD.menu_crud_vendedores()
+            elif opcion == "6":
+                from invoice_crud import FacturaCRUD
+                FacturaCRUD.menu_crud_facturas()
+                break
+            elif opcion == "7":
+                from purchase_order_crud import OrdenCompraCRUD
+                OrdenCompraCRUD.menu_crud_ordenes_compra()
+                break
+            elif opcion == "8":
+                from invoice_detail_crud import DetalleFacturaCRUD
+                DetalleFacturaCRUD.menu_crud_detalle_factura()
+                break
+            elif opcion == "9":
+                from purchase_detail_crud import DetalleCompraCRUD
+                DetalleCompraCRUD.menu_crud_detalle_compra()
+                break
+            elif opcion == "10":
+                from supply_crud import AbastecimientoCRUD
+                AbastecimientoCRUD.menu_crud_abastecimiento()
+                break
             else:
                 print("Opción inválida. Intente nuevamente.")
 

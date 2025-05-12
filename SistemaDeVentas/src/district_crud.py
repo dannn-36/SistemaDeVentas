@@ -22,10 +22,10 @@ class DistritoCRUD:
             elif opcion == "4":
                 DistritoCRUD.eliminar_distrito()
             elif opcion == "5":
+                print("Volviendo al Menú Principal...")
                 break
             else:
                 print("Opción inválida. Intente nuevamente.")
-
 
 
     @staticmethod
@@ -106,4 +106,4 @@ class DistritoCRUD:
                 print(f"Error al eliminar: {e}")
             finally:
                 conexion.close()
-        
+

@@ -23,9 +23,11 @@ class VendedorCRUD:
             elif opcion == "4":
                 VendedorCRUD.eliminar_vendedor()
             elif opcion == "5":
+                print("Volviendo al Menú Principal...")
                 break
             else:
-                print("Opción inválida.")
+                print("Opción inválida. Intente nuevamente.")
+
 
     @staticmethod
     def agregar_vendedor():
