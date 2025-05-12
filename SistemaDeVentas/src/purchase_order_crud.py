@@ -52,7 +52,7 @@ class OrdenCompraCRUD:
             try:
                 cursor = conexion.cursor()
                 sql = """
-                    INSERT INTO ORDEN_COMPRA (NUM_OC, FEC_OC, COD_PR, FEC_ENT, EST_OC)
+                    INSERT INTO ORDEN_COMPRA (NUM_OCO, FEC_OCO, COD_PR, FEC_ENT, EST_OCO)
                     VALUES (%s, %s, %s, %s, %s)
                 """
                 valores = (num_oc, fec_oc, cod_pr, fec_ent, est_oc)
@@ -70,7 +70,7 @@ class OrdenCompraCRUD:
         conexion = DatabaseConnection.conexionBaseDeDatos()
         if conexion:
             cursor = conexion.cursor()
-            cursor.execute("SELECT * FROM ORDEN_COMPRA WHERE NUM_OC = %s", (num_oc,))
+            cursor.execute("SELECT * FROM ORDEN_COMPRA WHERE NUM_OCO = %s", (num_oc,))
             orden = cursor.fetchone()
 
             if orden:
@@ -83,7 +83,7 @@ class OrdenCompraCRUD:
                 try:
                     sql = """
                         UPDATE ORDEN_COMPRA
-                        SET FEC_OC = %s, COD_PR = %s, FEC_ENT = %s, EST_OC = %s
+                        SET FEC_OCO = %s, COD_PR = %s, FEC_ENT = %s, EST_OC = %s
                         WHERE NUM_OC = %s
                     """
                     valores = (fec_oc, cod_pr, fec_ent, est_oc, num_oc)
@@ -103,7 +103,7 @@ class OrdenCompraCRUD:
         if conexion:
             try:
                 cursor = conexion.cursor()
-                cursor.execute("DELETE FROM ORDEN_COMPRA WHERE NUM_OC = %s", (num_oc,))
+                cursor.execute("DELETE FROM ORDEN_COMPRA WHERE NUM_OCO = %s", (num_oc,))
                 conexion.commit()
                 if cursor.rowcount > 0:
                     print("Orden de compra eliminada correctamente.")
