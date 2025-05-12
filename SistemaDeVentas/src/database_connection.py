@@ -6,7 +6,7 @@ class DatabaseConnection:
         try:
             conexion = mysql.connector.connect(
                 user='root',
-                password='2852',
+                password='',
                 port=3306,
                 host='localhost',
                 database='sistemadeventas'
@@ -39,38 +39,37 @@ class DatabaseConnection:
             elif opcion == "2":
                 from provider_crud import ProveedorCRUD
                 ProveedorCRUD.menu_crud_proveedores()
-                break
+                
             elif opcion == "3":
                 from district_crud import DistritoCRUD
                 DistritoCRUD.menu_crud_distritos()
-                break
             elif opcion == "4":
                 from product_crud import ProductoCRUD
                 ProductoCRUD.menu_crud_productos()
-                break
+               
             elif opcion == "5":
                 from seller_crud import VendedorCRUD
                 VendedorCRUD.menu_crud_vendedores()
             elif opcion == "6":
                 from invoice_crud import FacturaCRUD
                 FacturaCRUD.menu_crud_facturas()
-                break
+                
             elif opcion == "7":
                 from purchase_order_crud import OrdenCompraCRUD
                 OrdenCompraCRUD.menu_crud_ordenes_compra()
-                break
+                
             elif opcion == "8":
                 from invoice_detail_crud import DetalleFacturaCRUD
                 DetalleFacturaCRUD.menu_crud_detalle_factura()
-                break
+             
             elif opcion == "9":
                 from purchase_detail_crud import DetalleCompraCRUD
                 DetalleCompraCRUD.menu_crud_detalle_compra()
-                break
+             
             elif opcion == "10":
                 from supply_crud import AbastecimientoCRUD
                 AbastecimientoCRUD.menu_crud_abastecimiento()
-                break
+              
             else:
                 print("Opción inválida. Intente nuevamente.")
 
