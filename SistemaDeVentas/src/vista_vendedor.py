@@ -16,11 +16,23 @@ def main(page: ft.Page):
     form_eliminar = ft.Ref[ft.Container]()
     mensaje = ft.Ref[ft.Text]()
 
+    eliminar_dropdown = ft.Dropdown(label="Selecciona un vendedor", options=[])
+
+    def cargar_vendedores_para_eliminar():
+        vendedores = VendedorCRUD.mostrar_vendedores()
+        eliminar_dropdown.options = [
+            ft.dropdown.Option(f"{v[0]} - {v[1]} {v[2]}") for v in vendedores
+        ]
+        eliminar_dropdown.value = None
+        page.update()
+
     def cambiar_formulario(tab_ref):
         for ref in [form_agregar, form_mostrar, form_actualizar, form_eliminar]:
             ref.current.visible = False
         tab_ref.current.visible = True
         mensaje.current.value = ""
+        if tab_ref == form_eliminar:
+            cargar_vendedores_para_eliminar()
         page.update()
 
     def mostrar_mensaje(msg, success=True):
@@ -86,11 +98,14 @@ def main(page: ft.Page):
         mostrar_mensaje(msg, success)
 
     # Eliminar
-    eliminar_field = ft.TextField(label="Código del vendedor a eliminar")
-
     def eliminar_vendedor(e):
-        success, msg = VendedorCRUD.eliminar_vendedor(eliminar_field.value)
-        mostrar_mensaje(msg, success)
+        if eliminar_dropdown.value:
+            cod_ven = eliminar_dropdown.value.split(" - ")[0]
+            success, msg = VendedorCRUD.eliminar_vendedor(cod_ven)
+            mostrar_mensaje(msg, success)
+            cargar_vendedores_para_eliminar()
+        else:
+            mostrar_mensaje("Selecciona un vendedor para eliminar.", success=False)
 
     page.add(
         ft.Container(
@@ -148,7 +163,7 @@ def main(page: ft.Page):
                         visible=False,
                         content=ft.Column([
                             ft.Text("Eliminar Vendedor", size=20, weight="semi-bold", color="indigo"),
-                            eliminar_field,
+                            eliminar_dropdown,
                             ft.ElevatedButton("Eliminar Vendedor", on_click=eliminar_vendedor, bgcolor="red", color="white")
                         ])
                     )
