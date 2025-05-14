@@ -1,7 +1,6 @@
 import flet as ft
 from abastecimiento_crud import AbastecimientoCRUD
-from proveedor_crud import ProveedorCRUD
-from producto_crud import ProductoCRUD
+
 
 def main(page: ft.Page):
     page.title = "Sistema de Gestión de Abastecimientos"
@@ -39,91 +38,84 @@ def main(page: ft.Page):
         mensaje.current.color = "green" if success else "red"
         page.update()
 
-    def validar_campos(data, es_actualizar=False):
-        if not es_actualizar or data.get("cod_prv") and data.get("cod_pro") and data.get("precio"):
-            if not data["cod_prv"]:
-                return False, "El proveedor no puede estar vacío."
-            if not data["cod_pro"]:
-                return False, "El producto no puede estar vacío."
-            if not data["precio"].replace(".", "").isdigit():
-                return False, "El precio debe ser un número válido."
-
-        return True, ""
-
     # Campos agregar
     agregar_fields = {
-        'cod_prv': ft.Dropdown(label="Proveedor", options=[]),
-        'cod_pro': ft.Dropdown(label="Producto", options=[]),
-        'precio': ft.TextField(label="Precio")
+        'cod_prv': ft.TextField(label="Código del proveedor (ej: PR01)"),
+        'cod_pro': ft.TextField(label="Código del producto (ej: P001)"),
+        'pre_aba': ft.TextField(label="Precio de abastecimiento")
     }
 
-    def cargar_proveedores_y_productos():
-        proveedores = ProveedorCRUD.mostrar_proveedores()
-        productos = ProductoCRUD.mostrar_productos()
-
-        agregar_fields['cod_prv'].options = [
-            ft.dropdown.Option(f"{p[0]} - {p[1]}") for p in proveedores
-        ]
-        agregar_fields['cod_pro'].options = [
-            ft.dropdown.Option(f"{p[0]} - {p[1]}") for p in productos
-        ]
-        page.update()
-
     def on_guardar_abastecimiento(e):
-        data = {k: f.value for k, f in agregar_fields.items()}
+        try:
+            data = {k: f.value for k, f in agregar_fields.items()}
+            try:
+                data["pre_aba"] = float(data["pre_aba"])
+            except ValueError:
+                mostrar_mensaje("El precio debe ser un número sin puntos ni comas.", success=False)
+                return
 
-        valid, msg = validar_campos(data)
-        if not valid:
-            mostrar_mensaje(msg, success=False)
-            return
-
-        success, msg = AbastecimientoCRUD.insertar_abastecimiento(data["cod_prv"], data["cod_pro"], data["precio"])
-        mostrar_mensaje(msg, success)
-        if success:
-            for f in agregar_fields.values():
-                f.value = ""  # Limpiar los campos
+            success, msg = AbastecimientoCRUD.insertar_abastecimiento(**data)
+            mostrar_mensaje(msg, success)
+            if success:
+                for f in agregar_fields.values():
+                    f.value = ""
+        except Exception as ex:
+            mostrar_mensaje(f"Error al guardar abastecimiento: {ex}", success=False)
 
     # Mostrar tabla
     datatable = ft.DataTable(
-        columns=[ft.DataColumn(label=ft.Text("Proveedor")), ft.DataColumn(label=ft.Text("Producto")), ft.DataColumn(label=ft.Text("Precio"))],
+        columns=[
+            ft.DataColumn(label=ft.Text("Proveedor")),
+            ft.DataColumn(label=ft.Text("Producto")),
+            ft.DataColumn(label=ft.Text("Precio")),
+        ],
         rows=[]
     )
 
     def cargar_abastecimientos(e):
-        abastecimientos = AbastecimientoCRUD.listar_abastecimientos()
-        datatable.rows = [
-            ft.DataRow(cells=[ft.DataCell(ft.Text(str(col))) for col in a])
-            for a in abastecimientos
-        ]
-        mostrar_mensaje("Abastecimientos cargados correctamente")
+        try:
+            abastecimientos = AbastecimientoCRUD.listar_abastecimientos()
+            datatable.rows = [
+                ft.DataRow(cells=[ft.DataCell(ft.Text(str(col))) for col in a])
+                for a in abastecimientos
+            ]
+            mostrar_mensaje("Abastecimientos cargados correctamente")
+        except Exception as ex:
+            mostrar_mensaje(f"Error al cargar abastecimientos: {ex}", success=False)
 
     # Actualizar
     actualizar_fields = {
-        'cod_prv': ft.TextField(label="Código de proveedor a actualizar (ej: PR01)"),
-        'cod_pro': ft.TextField(label="Código de producto a actualizar (ej: P001)"),
-        'nuevo_precio': ft.TextField(label="Nuevo precio (dejar vacío para omitir)")
+        'cod_prv': ft.TextField(label="Código del proveedor (ej: PR01)"),
+        'cod_pro': ft.TextField(label="Código del producto (ej: P001)"),
+        'nuevo_precio': ft.TextField(label="Nuevo precio de abastecimiento")
     }
 
     def actualizar_abastecimiento(e):
-        data = {k: v.value if v.value != "" else None for k, v in actualizar_fields.items()}
+        try:
+            data = {k: v.value for k, v in actualizar_fields.items()}
+            try:
+                data["nuevo_precio"] = float(data["nuevo_precio"])
+            except ValueError:
+                mostrar_mensaje("El precio debe ser un número.", success=False)
+                return
 
-        valid, msg = validar_campos(data, es_actualizar=True)
-        if not valid:
-            mostrar_mensaje(msg, success=False)
-            return
-
-        success, msg = AbastecimientoCRUD.actualizar_abastecimiento(**data)
-        mostrar_mensaje(msg, success)
+            success, msg = AbastecimientoCRUD.actualizar_abastecimiento(**data)
+            mostrar_mensaje(msg, success)
+        except Exception as ex:
+            mostrar_mensaje(f"Error al actualizar abastecimiento: {ex}", success=False)
 
     # Eliminar
     def eliminar_abastecimiento(e):
-        if eliminar_dropdown.value:
-            cod_abs = eliminar_dropdown.value.split(" - ")[0]
-            success, msg = AbastecimientoCRUD.eliminar_abastecimiento(cod_abs)
-            mostrar_mensaje(msg, success)
-            cargar_abastecimientos_para_eliminar()
-        else:
-            mostrar_mensaje("Selecciona un abastecimiento para eliminar.", success=False)
+        try:
+            if eliminar_dropdown.value:
+                cod_prv, cod_pro = eliminar_dropdown.value.split(" - ")
+                success, msg = AbastecimientoCRUD.eliminar_abastecimiento(cod_prv, cod_pro)
+                mostrar_mensaje(msg, success)
+                cargar_abastecimientos_para_eliminar()
+            else:
+                mostrar_mensaje("Selecciona un abastecimiento para eliminar.", success=False)
+        except Exception as ex:
+            mostrar_mensaje(f"Error al eliminar abastecimiento: {ex}", success=False)
 
     # UI
     page.add(
@@ -135,7 +127,7 @@ def main(page: ft.Page):
                     ft.Text("Sistema de Gestión de Abastecimientos", size=30, weight="bold", color="indigo", text_align="center"),
                     ft.Text("Interfaz para administrar la base de datos de abastecimientos", color="grey", text_align="center"),
 
-                    ft.Row([ 
+                    ft.Row([
                         ft.TextButton("Agregar Abastecimiento", on_click=lambda e: cambiar_formulario(form_agregar)),
                         ft.TextButton("Mostrar Abastecimientos", on_click=lambda e: cambiar_formulario(form_mostrar)),
                         ft.TextButton("Actualizar Abastecimiento", on_click=lambda e: cambiar_formulario(form_actualizar)),
@@ -199,6 +191,5 @@ def main(page: ft.Page):
         )
     )
 
-    cargar_proveedores_y_productos()
 
 ft.app(target=main)

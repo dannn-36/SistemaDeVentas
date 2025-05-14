@@ -1,6 +1,7 @@
 import flet as ft
 from datetime import datetime
 from proveedor_crud import ProveedorCRUD
+from distrito_crud import DistritoCRUD  # Import DistritoCRUD for district validation
 
 
 def main(page: ft.Page):
@@ -64,6 +65,10 @@ def main(page: ft.Page):
         if not es_actualizar or data.get("cod_dis"):
             if not data["cod_dis"].startswith("D") or not data["cod_dis"][1:].isdigit():
                 return False, "Código de distrito inválido. Debe comenzar con 'D' seguido de números (ej: D01)."
+            # Validar si el distrito existe
+            distritos_existentes = [d[0] for d in DistritoCRUD.listar_distritos()]
+            if data["cod_dis"] not in distritos_existentes:
+                return False, "El código de distrito no existe. Por favor, verifica el código."
 
         if not es_actualizar or data.get("rep_pro"):
             if not data["rep_pro"]:

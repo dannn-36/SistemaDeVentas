@@ -5,6 +5,7 @@ class AbastecimientoCRUD:
 
     @staticmethod
     def insertar_abastecimiento(cod_prv, cod_pro, pre_aba):
+        conexion = None  # Initialize conexion to None
         try:
             if not cod_prv.startswith("PR") or not cod_prv[2:].isdigit():
                 raise ValueError("Código de proveedor inválido. Debe comenzar con 'PR' seguido de números (ej: PR01).")
@@ -26,7 +27,7 @@ class AbastecimientoCRUD:
         except mysql.connector.Error as error:
             return False, f"Error al insertar abastecimiento: {error}"
         finally:
-            if conexion.is_connected():
+            if conexion and conexion.is_connected():  # Check if conexion is not None
                 cursor.close()
                 conexion.close()
 
