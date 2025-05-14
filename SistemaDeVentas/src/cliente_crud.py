@@ -43,6 +43,19 @@ class ClienteCRUD:
     @staticmethod
     def actualizar_cliente(cod_cli, rso_cli=None, dir_cli=None, tlf_cli=None, ruc_cli=None, cod_dis=None, fec_reg=None, tip_cli=None, con_cli=None):
         try:
+            if not cod_cli or not cod_cli.startswith("C") or not cod_cli[1:].isdigit():
+                raise ValueError("Código de cliente inválido. Debe comenzar con 'C' seguido de números (ej: C01).")
+            if rso_cli and not rso_cli.strip():
+                raise ValueError("La razón social no puede estar vacía.")
+            if dir_cli and not dir_cli.strip():
+                raise ValueError("La dirección no puede estar vacía.")
+            if tlf_cli and not tlf_cli.isdigit():
+                raise ValueError("El teléfono debe contener solo números.")
+            if ruc_cli and not ruc_cli.isdigit():
+                raise ValueError("El RUC debe contener solo números si se proporciona.")
+            if cod_dis and (not cod_dis.startswith("D") or not cod_dis[1:].isdigit()):
+                raise ValueError("Código de distrito inválido. Debe comenzar con 'D' seguido de números (ej: D01).")
+
             conexion = DatabaseConnection.conexionBaseDeDatos()
             cursor = conexion.cursor()
 
@@ -83,6 +96,8 @@ class ClienteCRUD:
             else:
                 return False, "No se proporcionaron campos para actualizar."
 
+        except ValueError as ve:
+            return False, str(ve)
         except mysql.connector.Error as error:
             return False, f"Error al actualizar cliente: {error}"
         finally:
@@ -93,11 +108,16 @@ class ClienteCRUD:
     @staticmethod
     def eliminar_cliente(cod_cli):
         try:
+            if not cod_cli or not cod_cli.startswith("C") or not cod_cli[1:].isdigit():
+                raise ValueError("Código de cliente inválido. Debe comenzar con 'C' seguido de números (ej: C01).")
+
             conexion = DatabaseConnection.conexionBaseDeDatos()
             cursor = conexion.cursor()
             cursor.execute("DELETE FROM CLIENTE WHERE COD_CLI = %s", (cod_cli,))
             conexion.commit()
             return True, "Cliente eliminado correctamente."
+        except ValueError as ve:
+            return False, str(ve)
         except mysql.connector.Error as error:
             return False, f"Error al eliminar cliente: {error}"
         finally:

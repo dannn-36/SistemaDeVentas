@@ -42,7 +42,9 @@ def main(page: ft.Page):
     def validar_campos(data, es_actualizar=False):
         if not es_actualizar or data.get("fec_reg"):
             try:
-                datetime.strptime(data["fec_reg"], "%Y-%m-%d")
+                fecha_registro = datetime.strptime(data["fec_reg"], "%Y-%m-%d")
+                if fecha_registro > datetime.now():
+                    return False, "La fecha de registro no puede ser mayor que la fecha actual."
             except ValueError:
                 return False, "Fecha inválida. Debe tener el formato YYYY-MM-DD (ej: 2023-12-31)."
 
@@ -51,8 +53,10 @@ def main(page: ft.Page):
                 return False, "El tipo de cliente debe contener solo números."
 
         if not es_actualizar or data.get("con_cli"):
-            if not data["con_cli"].isalpha():
-                return False, "La condición del cliente debe contener solo letras."
+            if not data["con_cli"].strip():
+                return False, "El nombre del contacto es obligatorio."
+            if not all(char.isalpha() or char.isspace() for char in data["con_cli"]):
+                return False, "El nombre del contacto debe contener solo letras y espacios."
 
         if not es_actualizar or data.get("cod_cli"):
             if not data["cod_cli"] or not data["cod_cli"].startswith("C") or not data["cod_cli"][1:].isdigit():
@@ -86,27 +90,30 @@ def main(page: ft.Page):
         'rso_cli': ft.TextField(label="Razón Social"),
         'dir_cli': ft.TextField(label="Dirección"),
         'tlf_cli': ft.TextField(label="Teléfono"),
-        'ruc_cli': ft.TextField(label="RUC"),
+        'ruc_cli': ft.TextField(label="RUC (opcional)"),
         'cod_dis': ft.TextField(label="Código del distrito (ej: D01)"),
         'fec_reg': ft.TextField(label="Fecha de registro (YYYY-MM-DD)"),
         'tip_cli': ft.TextField(label="Tipo de cliente"),
-        'con_cli': ft.TextField(label="Condición del cliente")
+        'con_cli': ft.TextField(label="Nombre del contacto (obligatorio)")
     }
 
     def on_guardar_cliente(e):
-        data = {k: f.value for k, f in agregar_fields.items()}
-        data["ruc_cli"] = data["ruc_cli"] or None  # Make RUC optional
+        try:
+            data = {k: f.value for k, f in agregar_fields.items()}
+            data["ruc_cli"] = data["ruc_cli"] or None  # Make RUC optional
 
-        valid, msg = validar_campos(data)
-        if not valid:
-            mostrar_mensaje(msg, success=False)
-            return
+            valid, msg = validar_campos(data)
+            if not valid:
+                mostrar_mensaje(msg, success=False)
+                return
 
-        success, msg = ClienteCRUD.agregar_cliente(**data)
-        mostrar_mensaje(msg, success)
-        if success:
-            for f in agregar_fields.values():
-                f.value = ""
+            success, msg = ClienteCRUD.agregar_cliente(**data)
+            mostrar_mensaje(msg, success)
+            if success:
+                for f in agregar_fields.values():
+                    f.value = ""
+        except Exception as ex:
+            mostrar_mensaje(f"Error al guardar cliente: {ex}", success=False)
 
     # Mostrar tabla
     datatable = ft.DataTable(
@@ -119,18 +126,21 @@ def main(page: ft.Page):
             ft.DataColumn(label=ft.Text("Distrito")),
             ft.DataColumn(label=ft.Text("Fecha Registro")),
             ft.DataColumn(label=ft.Text("Tipo")),
-            ft.DataColumn(label=ft.Text("Condición")),
+            ft.DataColumn(label=ft.Text("Contacto")),
         ],
         rows=[]
     )
 
     def cargar_clientes(e):
-        clientes = ClienteCRUD.mostrar_clientes()
-        datatable.rows = [
-            ft.DataRow(cells=[ft.DataCell(ft.Text(str(col))) for col in c])
-            for c in clientes
-        ]
-        mostrar_mensaje("Clientes cargados correctamente")
+        try:
+            clientes = ClienteCRUD.mostrar_clientes()
+            datatable.rows = [
+                ft.DataRow(cells=[ft.DataCell(ft.Text(str(col))) for col in c])
+                for c in clientes
+            ]
+            mostrar_mensaje("Clientes cargados correctamente")
+        except Exception as ex:
+            mostrar_mensaje(f"Error al cargar clientes: {ex}", success=False)
 
     # Actualizar
     actualizar_fields = {
@@ -138,33 +148,39 @@ def main(page: ft.Page):
         'rso_cli': ft.TextField(label="Nueva razón social (dejar vacío para omitir)"),
         'dir_cli': ft.TextField(label="Nueva dirección (dejar vacío para omitir)"),
         'tlf_cli': ft.TextField(label="Nuevo teléfono (dejar vacío para omitir)"),
-        'ruc_cli': ft.TextField(label="Nuevo RUC (dejar vacío para omitir)"),
+        'ruc_cli': ft.TextField(label="Nuevo RUC (opcional, dejar vacío para omitir)"),
         'cod_dis': ft.TextField(label="Nuevo código de distrito (ej: D01, dejar vacío para omitir)"),
         'fec_reg': ft.TextField(label="Nueva fecha de registro (YYYY-MM-DD, dejar vacío para omitir)"),
         'tip_cli': ft.TextField(label="Nuevo tipo de cliente (dejar vacío para omitir)"),
-        'con_cli': ft.TextField(label="Nueva condición del cliente (dejar vacío para omitir)")
+        'con_cli': ft.TextField(label="Nuevo nombre del contacto (obligatorio, dejar vacío para omitir)")
     }
 
     def actualizar_cliente(e):
-        data = {k: v.value if v.value != "" else None for k, v in actualizar_fields.items()}
+        try:
+            data = {k: v.value if v.value != "" else None for k, v in actualizar_fields.items()}
 
-        valid, msg = validar_campos(data, es_actualizar=True)
-        if not valid:
-            mostrar_mensaje(msg, success=False)
-            return
+            valid, msg = validar_campos(data, es_actualizar=True)
+            if not valid:
+                mostrar_mensaje(msg, success=False)
+                return
 
-        success, msg = ClienteCRUD.actualizar_cliente(**data)
-        mostrar_mensaje(msg, success)
+            success, msg = ClienteCRUD.actualizar_cliente(**data)
+            mostrar_mensaje(msg, success)
+        except Exception as ex:
+            mostrar_mensaje(f"Error al actualizar cliente: {ex}", success=False)
 
     # Eliminar
     def eliminar_cliente(e):
-        if eliminar_dropdown.value:
-            cod_cli = eliminar_dropdown.value.split(" - ")[0]
-            success, msg = ClienteCRUD.eliminar_cliente(cod_cli)
-            mostrar_mensaje(msg, success)
-            cargar_clientes_para_eliminar()
-        else:
-            mostrar_mensaje("Selecciona un cliente para eliminar.", success=False)
+        try:
+            if eliminar_dropdown.value:
+                cod_cli = eliminar_dropdown.value.split(" - ")[0]
+                success, msg = ClienteCRUD.eliminar_cliente(cod_cli)
+                mostrar_mensaje(msg, success)
+                cargar_clientes_para_eliminar()
+            else:
+                mostrar_mensaje("Selecciona un cliente para eliminar.", success=False)
+        except Exception as ex:
+            mostrar_mensaje(f"Error al eliminar cliente: {ex}", success=False)
 
     # UI
     page.add(
@@ -242,3 +258,4 @@ def main(page: ft.Page):
 
 
 ft.app(target=main)
+

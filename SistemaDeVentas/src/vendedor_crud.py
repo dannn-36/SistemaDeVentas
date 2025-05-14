@@ -40,6 +40,19 @@ class VendedorCRUD:
     @staticmethod
     def actualizar_vendedor(cod_ven, nom_ven=None, ape_ven=None, sue_ven=None, fin_ven=None, tip_ven=None, cod_dis=None):
         try:
+            if not cod_ven or not cod_ven.startswith("V") or not cod_ven[1:].isdigit():
+                raise ValueError("Código de vendedor inválido. Debe comenzar con 'V' seguido de números (ej: V01).")
+            if nom_ven and any(char.isdigit() for char in nom_ven):
+                raise ValueError("El nombre no debe contener números.")
+            if ape_ven and any(char.isdigit() for char in ape_ven):
+                raise ValueError("El apellido no debe contener números.")
+            if sue_ven and (not sue_ven.isdigit() or "." in sue_ven or "," in sue_ven):
+                raise ValueError("El sueldo debe contener solo números sin puntos ni comas.")
+            if tip_ven and not tip_ven.isdigit():
+                raise ValueError("El tipo de vendedor debe contener solo números.")
+            if cod_dis and (not cod_dis.startswith("D") or not cod_dis[1:].isdigit()):
+                raise ValueError("Código de distrito inválido. Debe comenzar con 'D' seguido de números (ej: D01).")
+
             conexion = DatabaseConnection.conexionBaseDeDatos()
             cursor = conexion.cursor()
 
@@ -74,6 +87,8 @@ class VendedorCRUD:
             else:
                 return False, "No se proporcionaron campos para actualizar."
 
+        except ValueError as ve:
+            return False, str(ve)
         except mysql.connector.Error as error:
             return False, f"Error al actualizar vendedor: {error}"
         finally:
@@ -84,13 +99,35 @@ class VendedorCRUD:
     @staticmethod
     def eliminar_vendedor(cod_ven):
         try:
+            if not cod_ven or not cod_ven.startswith("V") or not cod_ven[1:].isdigit():
+                raise ValueError("Código de vendedor inválido. Debe comenzar con 'V' seguido de números (ej: V01).")
+
             conexion = DatabaseConnection.conexionBaseDeDatos()
             cursor = conexion.cursor()
             cursor.execute("DELETE FROM VENDEDOR WHERE COD_VEN = %s", (cod_ven,))
             conexion.commit()
             return True, "Vendedor eliminado correctamente."
+        except ValueError as ve:
+            return False, str(ve)
         except mysql.connector.Error as error:
             return False, f"Error al eliminar vendedor: {error}"
+        finally:
+            if conexion.is_connected():
+                cursor.close()
+                conexion.close()
+
+    @staticmethod
+    def obtener_distritos():
+        try:
+            conexion = DatabaseConnection.conexionBaseDeDatos()
+            cursor = conexion.cursor()
+            query = "SELECT COD_DIS FROM distrito"
+            cursor.execute(query)
+            # Ensure the result is a list of strings
+            return [row[0] for row in cursor.fetchall()]
+        except mysql.connector.Error as ex:
+            print(f"Error al obtener distritos: {ex}")
+            return []
         finally:
             if conexion.is_connected():
                 cursor.close()

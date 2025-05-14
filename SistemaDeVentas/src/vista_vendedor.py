@@ -42,31 +42,44 @@ def main(page: ft.Page):
 
     def validar_campos(data, es_actualizar=False):
         # Validar fecha primero si está presente
-        if 'fin_ven' in data and data['fin_ven']:
+        if not es_actualizar or data.get("fin_ven"):
+            if not data["fin_ven"]:
+                return False, "La fecha de ingreso es obligatoria."
             try:
-                datetime.strptime(data['fin_ven'], "%Y-%m-%d")
+                fecha_ingreso = datetime.strptime(data["fin_ven"], "%Y-%m-%d")
+                if fecha_ingreso > datetime.now():
+                    return False, "La fecha de ingreso no puede ser mayor que la fecha actual."
             except ValueError:
                 return False, "Fecha inválida. Debe tener el formato YYYY-MM-DD (ej: 2023-12-31)."
+
+        if not es_actualizar or data.get("nom_ven"):
+            if not data["nom_ven"].strip():
+                return False, "El nombre es obligatorio."
+            if any(char.isdigit() for char in data["nom_ven"]):
+                return False, "El nombre no debe contener números."
+
+        if not es_actualizar or data.get("ape_ven"):
+            if not data["ape_ven"].strip():
+                return False, "El apellido es obligatorio."
+            if any(char.isdigit() for char in data["ape_ven"]):
+                return False, "El apellido no debe contener números."
+
+        if not es_actualizar or data.get("sue_ven"):
+            if not data["sue_ven"]:
+                return False, "El sueldo es obligatorio."
+            if not data["sue_ven"].isdigit() or "." in data["sue_ven"] or "," in data["sue_ven"]:
+                return False, "El sueldo debe contener solo números sin puntos ni comas."
 
         if not es_actualizar or data.get("cod_ven"):
             if not data["cod_ven"] or not data["cod_ven"].startswith("V") or not data["cod_ven"][1:].isdigit():
                 return False, "Código de vendedor inválido. Debe comenzar con 'V' seguido de números (ej: V11)."
+            # Validar código repetido
+            if not es_actualizar and any(v[0] == data["cod_ven"] for v in VendedorCRUD.mostrar_vendedores()):
+                return False, "El código de vendedor ya existe. Por favor, elige otro."
 
-        if not es_actualizar or data.get("nom_ven"):
-            if any(char.isdigit() for char in data.get("nom_ven", "")):
-                return False, "El nombre no debe contener números."
-
-        if not es_actualizar or data.get("ape_ven"):
-            if any(char.isdigit() for char in data.get("ape_ven", "")):
-                return False, "El apellido no debe contener números."
-
-        if not es_actualizar or data.get("sue_ven"):
-            if "." in data.get("sue_ven", "") or "," in data.get("sue_ven", ""):
-                return False, "El sueldo no debe contener puntos ni comas."
-                
         if not es_actualizar or data.get("tip_ven"):
             if not data["tip_ven"].isdigit():
-               return False, "El tipo de vendedor debe contener solo números."
+                return False, "El tipo de vendedor debe contener solo números."
 
         if not es_actualizar or data.get("cod_dis"):
             if not data["cod_dis"].startswith("D") or not data["cod_dis"][1:].isdigit():
@@ -77,27 +90,30 @@ def main(page: ft.Page):
     # Campos agregar
     agregar_fields = {
         'cod_ven': ft.TextField(label="Código del vendedor (ej: V11)"),
-        'nom_ven': ft.TextField(label="Nombre"),
-        'ape_ven': ft.TextField(label="Apellido"),
-        'sue_ven': ft.TextField(label="Sueldo (Sin puntos ni comas, ej: 1500)"),
-        'fin_ven': ft.TextField(label="Fecha de ingreso, formato YYYY-MM-DD (ej: 2023-12-31)"),
+        'nom_ven': ft.TextField(label="Nombre (obligatorio)"),
+        'ape_ven': ft.TextField(label="Apellido (obligatorio)"),
+        'sue_ven': ft.TextField(label="Sueldo (obligatorio, sin puntos ni comas, ej: 1500)"),
+        'fin_ven': ft.TextField(label="Fecha de ingreso (obligatoria, formato YYYY-MM-DD, ej: 2023-12-31)"),
         'tip_ven': ft.TextField(label="Tipo de vendedor (ej: 1 o 2)"),
         'cod_dis': ft.TextField(label="Código del distrito (ej: D01)")
     }
 
     def on_guardar_vendedor(e):
-        data = {k: f.value for k, f in agregar_fields.items()}
+        try:
+            data = {k: f.value for k, f in agregar_fields.items()}
 
-        valid, msg = validar_campos(data)
-        if not valid:
-            mostrar_mensaje(msg, success=False)
-            return
+            valid, msg = validar_campos(data)
+            if not valid:
+                mostrar_mensaje(msg, success=False)
+                return
 
-        success, msg = VendedorCRUD.agregar_vendedor(**data)
-        mostrar_mensaje(msg, success)
-        if success:
-            for f in agregar_fields.values():
-                f.value = ""
+            success, msg = VendedorCRUD.agregar_vendedor(**data)
+            mostrar_mensaje(msg, success)
+            if success:
+                for f in agregar_fields.values():
+                    f.value = ""
+        except Exception as ex:
+            mostrar_mensaje(f"Error al guardar vendedor: {ex}", success=False)
 
     # Mostrar tabla
     datatable = ft.DataTable(
@@ -114,44 +130,53 @@ def main(page: ft.Page):
     )
 
     def cargar_vendedores(e):
-        vendedores = VendedorCRUD.mostrar_vendedores()
-        datatable.rows = [
-            ft.DataRow(cells=[ft.DataCell(ft.Text(str(col))) for col in v])
-            for v in vendedores
-        ]
-        mostrar_mensaje("Vendedores cargados correctamente")
+        try:
+            vendedores = VendedorCRUD.mostrar_vendedores()
+            datatable.rows = [
+                ft.DataRow(cells=[ft.DataCell(ft.Text(str(col))) for col in v])
+                for v in vendedores
+            ]
+            mostrar_mensaje("Vendedores cargados correctamente")
+        except Exception as ex:
+            mostrar_mensaje(f"Error al cargar vendedores: {ex}", success=False)
 
     # Actualizar
     actualizar_fields = {
         'cod_ven': ft.TextField(label="Código del vendedor a actualizar (ej: V03)"),
-        'nom_ven': ft.TextField(label="Nuevo nombre (dejar vacío para omitir)"),
-        'ape_ven': ft.TextField(label="Nuevo apellido (dejar vacío para omitir)"),
-        'sue_ven': ft.TextField(label="Nuevo sueldo (Sin puntos ni comas, ej: 1500, dejar vacío para omitir)"),
-        'fin_ven': ft.TextField( label="Nueva fecha de ingreso, formato YYYY-MM-DD (dejar vacío para omitir)"),
+        'nom_ven': ft.TextField(label="Nuevo nombre (obligatorio, dejar vacío para omitir)"),
+        'ape_ven': ft.TextField(label="Nuevo apellido (obligatorio, dejar vacío para omitir)"),
+        'sue_ven': ft.TextField(label="Nuevo sueldo (obligatorio, sin puntos ni comas, dejar vacío para omitir)"),
+        'fin_ven': ft.TextField(label="Nueva fecha de ingreso (obligatoria, formato YYYY-MM-DD, dejar vacío para omitir)"),
         'tip_ven': ft.TextField(label="Nuevo tipo de vendedor (ej: 1 o 2, dejar vacío para omitir)"),
         'cod_dis': ft.TextField(label="Nuevo código de distrito (ej: D05, dejar vacío para omitir)")
     }
 
     def actualizar_vendedor(e):
-        data = {k: v.value if v.value != "" else None for k, v in actualizar_fields.items()}
+        try:
+            data = {k: v.value if v.value != "" else None for k, v in actualizar_fields.items()}
 
-        valid, msg = validar_campos(data, es_actualizar=True)
-        if not valid:
-            mostrar_mensaje(msg, success=False)
-            return
+            valid, msg = validar_campos(data, es_actualizar=True)
+            if not valid:
+                mostrar_mensaje(msg, success=False)
+                return
 
-        success, msg = VendedorCRUD.actualizar_vendedor(**data)
-        mostrar_mensaje(msg, success)
+            success, msg = VendedorCRUD.actualizar_vendedor(**data)
+            mostrar_mensaje(msg, success)
+        except Exception as ex:
+            mostrar_mensaje(f"Error al actualizar vendedor: {ex}", success=False)
 
     # Eliminar
     def eliminar_vendedor(e):
-        if eliminar_dropdown.value:
-            cod_ven = eliminar_dropdown.value.split(" - ")[0]
-            success, msg = VendedorCRUD.eliminar_vendedor(cod_ven)
-            mostrar_mensaje(msg, success)
-            cargar_vendedores_para_eliminar()
-        else:
-            mostrar_mensaje("Selecciona un vendedor para eliminar.", success=False)
+        try:
+            if eliminar_dropdown.value:
+                cod_ven = eliminar_dropdown.value.split(" - ")[0]
+                success, msg = VendedorCRUD.eliminar_vendedor(cod_ven)
+                mostrar_mensaje(msg, success)
+                cargar_vendedores_para_eliminar()
+            else:
+                mostrar_mensaje("Selecciona un vendedor para eliminar.", success=False)
+        except Exception as ex:
+            mostrar_mensaje(f"Error al eliminar vendedor: {ex}", success=False)
 
     # UI
     page.add(
