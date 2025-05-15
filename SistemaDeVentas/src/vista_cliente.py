@@ -188,7 +188,9 @@ def main(page: ft.Page):
             mostrar_mensaje(f"Error al eliminar cliente: {ex}", success=False)
 
     # UI
-    page.add(
+    return ft.View(
+        route="/cliente",
+        controls=[
         ft.Container(
             padding=20,
             alignment=ft.alignment.center,
@@ -203,6 +205,14 @@ def main(page: ft.Page):
                         ft.TextButton("Actualizar Cliente", on_click=lambda e: cambiar_formulario(form_actualizar)),
                         ft.TextButton("Eliminar Cliente", on_click=lambda e: cambiar_formulario(form_eliminar)),
                     ], alignment=ft.MainAxisAlignment.CENTER),
+
+                     # Botón para volver al menú principal
+                    ft.ElevatedButton(
+                        "Volver al Menú Principal",
+                        on_click=lambda e: page.go("/"),
+                        bgcolor="indigo",
+                        color="white"
+                    ),
 
                     ft.Text(ref=mensaje, text_align="center"),
 
@@ -259,8 +269,8 @@ def main(page: ft.Page):
                 expand=True
             )
         )
+        ]
     )
 
 
-ft.app(target=main)
 

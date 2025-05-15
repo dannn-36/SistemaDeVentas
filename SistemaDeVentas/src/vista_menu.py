@@ -1,10 +1,16 @@
 import flet as ft
+import sys
 from vista_proveedor import main as vista_proveedor
 from vista_producto import main as vista_producto
 from vista_vendedor import main as vista_vendedor
 from vista_detalle_factura import main as vista_detalle_factura
 from vista_factura import main as vista_factura
 from vista_orden_compra import main as vista_orden_compra
+from vista_detalle_compra import main as vista_detalle_compra
+from vista_abastecimiento import main as vista_abastecimiento
+from vista_distrito import main as vista_distrito
+from vista_cliente import main as vista_cliente
+
 
 def main(page: ft.Page):
     page.title = "Sistema de Gestión"
@@ -22,7 +28,7 @@ def main(page: ft.Page):
                         ft.Container(
                             content=ft.Column(
                                 [
-                                    ft.Text("📊 Menú Principal", size=36, weight="bold", text_align="center"),
+                                    ft.Text("Menú Principal", size=36, weight="bold", text_align="center"),
                                     ft.Divider(),
                                     ft.ElevatedButton("👤 Ir a Proveedores", icon=ft.Icons.PEOPLE, style=button_style, on_click=lambda _: page.go("/proveedor")),
                                     ft.ElevatedButton("📦 Ir a Productos", icon=ft.Icons.INVENTORY, style=button_style, on_click=lambda _: page.go("/producto")),
@@ -30,6 +36,12 @@ def main(page: ft.Page):
                                     ft.ElevatedButton("🧾 Ir a Facturas", icon=ft.Icons.RECEIPT, style=button_style, on_click=lambda _: page.go("/factura")),
                                     ft.ElevatedButton("📋 Ir a Detalles de Factura", icon=ft.Icons.LIST_ALT, style=button_style, on_click=lambda _: page.go("/detalle_factura")),
                                     ft.ElevatedButton("📑 Ir a Órdenes de Compra", icon=ft.Icons.SHOPPING_CART, style=button_style, on_click=lambda _: page.go("/orden_compra")),
+                                    ft.ElevatedButton("📦 Ir a Detalles de Compra", icon=ft.Icons.LIST, style=button_style, on_click=lambda _: page.go("/detalle_compra")),
+                                    ft.ElevatedButton("🏢 Ir a Abastecimiento", icon=ft.Icons.WAREHOUSE, style=button_style, on_click=lambda _: page.go("/abastecimiento")),
+                                    ft.ElevatedButton("🏙️ Ir a Distritos", icon=ft.Icons.LOCATION_CITY, style=button_style, on_click=lambda _: page.go("/distrito")),
+                                    ft.ElevatedButton("👥 Ir a Clientes", icon=ft.Icons.PERSON, style=button_style, on_click=lambda _: page.go("/cliente")),
+                                    ft.ElevatedButton("❌ Salir", color = "red", icon=ft.Icons.EXIT_TO_APP, style=button_style, on_click=lambda _: sys.exit()),
+                                    #no funciona esta funcion de arriba 
                                 ],
                                 alignment=ft.MainAxisAlignment.CENTER,
                                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -64,6 +76,14 @@ def main(page: ft.Page):
             page.views.append(vista_detalle_factura(page))
         elif page.route == "/orden_compra":
             page.views.append(vista_orden_compra(page))
+        elif page.route == "/detalle_compra":
+            page.views.append(vista_detalle_compra(page))
+        elif page.route == "/abastecimiento":
+            page.views.append(vista_abastecimiento(page))
+        elif page.route == "/distrito":
+            page.views.append(vista_distrito(page))
+        elif page.route == "/cliente":
+            page.views.append(vista_cliente(page))
 
         page.update()
 
@@ -76,9 +96,9 @@ def main(page: ft.Page):
     button_style = ft.ButtonStyle(
         shape=ft.RoundedRectangleBorder(radius=12),
         padding=20,
-        bgcolor=ft.Colors.INDIGO_600,
+        bgcolor=ft.Colors.INDIGO,
         color=ft.Colors.WHITE,
-        overlay_color=ft.Colors.INDIGO_600
+        overlay_color=ft.Colors.INDIGO
     )
 
     page.on_route_change = route_change
