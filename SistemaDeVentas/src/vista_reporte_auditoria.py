@@ -7,9 +7,9 @@ def vista_reporte_auditoria(page: ft.Page):
             ft.Row(
                 [
                     ft.ElevatedButton(
-                        "Volver al Menú Principal",
+                        "Volver al Menú de Reportes",
                         icon=ft.Icons.ARROW_BACK,
-                        on_click=lambda _: page.go("/menu"),
+                        on_click=lambda _: page.go("/reportes"),
                         style=ft.ButtonStyle(
                             bgcolor=ft.Colors.INDIGO,
                             color=ft.Colors.WHITE,
