@@ -135,7 +135,7 @@ def main(page: ft.Page):
                      # Botón para volver al menú principal
                     ft.ElevatedButton(
                         "Volver al Menú Principal",
-                        on_click=lambda e: page.go("/"),
+                        on_click=lambda e: page.go("/menu"),
                         bgcolor="indigo",
                         color="white"
                     ),
