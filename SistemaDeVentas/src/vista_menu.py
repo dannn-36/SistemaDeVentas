@@ -19,6 +19,7 @@ def main(page: ft.Page):
     page.padding = 30
     page.bgcolor = "#f2f2f7"  # Fondo suave tipo iOS
 
+
     def route_change(e: ft.RouteChangeEvent):
         if page.route == "/":
             page.views.append(
