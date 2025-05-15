@@ -4,6 +4,8 @@ from vista_producto import main as vista_producto  # Importa la vista del produc
 from vista_vendedor import main as vista_vendedor  # Importa la vista del vendedor
 from vista_detalle_factura import main as vista_detalle_factura  # Importa la vista del detalle de factura
 from vista_factura import main as vista_factura  # Importa la vista de la factura   
+from vista_orden_compra import main as vista_orden_compra  # Importa la vista de la orden de compra
+
 
 def main(page: ft.Page):
     page.title = "Sistema de Gestión"
@@ -24,7 +26,8 @@ def main(page: ft.Page):
                         ft.ElevatedButton("Ir a Productos", on_click=lambda _: page.go("/producto")),
                         ft.ElevatedButton("Ir a Vendedores", on_click=lambda _: page.go("/vendedor")),
                         ft.ElevatedButton("Ir a Facturas", on_click=lambda _: page.go("/factura")),
-                        ft.ElevatedButton("Ir a Detalles de Factura", on_click=lambda _: page.go("/detalle_factura"))
+                        ft.ElevatedButton("Ir a Detalles de Factura", on_click=lambda _: page.go("/detalle_factura")),
+                        ft.ElevatedButton("Ir a Órdenes de Compra", on_click=lambda _: page.go("/orden_compra"))
                     ],
                     vertical_alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
@@ -45,6 +48,9 @@ def main(page: ft.Page):
         elif page.route == "/detalle_factura":
             # Cargar la vista del detalle de factura desde otro archivo
             page.views.append(vista_detalle_factura(page))
+        elif page.route == "/orden_compra":
+            # Cargar la vista de la orden de compra desde otro archivo
+            page.views.append(vista_orden_compra(page))
 
         page.update()
 
