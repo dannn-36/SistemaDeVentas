@@ -1,8 +1,6 @@
 import flet as ft
-from datetime import datetime
 from proveedor_crud import ProveedorCRUD
-from distrito_crud import DistritoCRUD  # Import DistritoCRUD for district validation
-
+from distrito_crud import DistritoCRUD
 
 def main(page: ft.Page):
     page.title = "Sistema de Gestión de Proveedores"
@@ -44,7 +42,6 @@ def main(page: ft.Page):
         if not es_actualizar or data.get("cod_prv"):
             if not data["cod_prv"] or not data["cod_prv"].startswith("PR") or not data["cod_prv"][2:].isdigit():
                 return False, "Código de proveedor inválido. Debe comenzar con 'PR' seguido de números (ej: PR01)."
-            # Verificar si el proveedor ya existe
             if not es_actualizar:
                 success, msg = ProveedorCRUD.agregar_proveedor(data["cod_prv"], None, None, None, None, None)
                 if not success and "ya existe" in msg:
@@ -59,13 +56,12 @@ def main(page: ft.Page):
                 return False, "La dirección no puede estar vacía."
 
         if not es_actualizar or data.get("tel_prv"):
-            if not data["tel_prv"].isdigit():
+            if not data["tel_prv"] or not data["tel_prv"].isdigit():
                 return False, "El teléfono debe contener solo números."
 
         if not es_actualizar or data.get("cod_dis"):
             if not data["cod_dis"].startswith("D") or not data["cod_dis"][1:].isdigit():
                 return False, "Código de distrito inválido. Debe comenzar con 'D' seguido de números (ej: D01)."
-            # Validar si el distrito existe
             distritos_existentes = [d[0] for d in DistritoCRUD.listar_distritos()]
             if data["cod_dis"] not in distritos_existentes:
                 return False, "El código de distrito no existe. Por favor, verifica el código."
@@ -76,7 +72,7 @@ def main(page: ft.Page):
 
         return True, ""
 
-    # Campos agregar
+    # Campos para Agregar
     agregar_fields = {
         'cod_prv': ft.TextField(label="Código del proveedor (ej: PR01)"),
         'rso_prv': ft.TextField(label="Razón Social"),
@@ -88,19 +84,17 @@ def main(page: ft.Page):
 
     def on_guardar_proveedor(e):
         data = {k: f.value for k, f in agregar_fields.items()}
-
         valid, msg = validar_campos(data)
         if not valid:
             mostrar_mensaje(msg, success=False)
             return
-
         success, msg = ProveedorCRUD.agregar_proveedor(**data)
         mostrar_mensaje(msg, success)
         if success:
             for f in agregar_fields.values():
                 f.value = ""
 
-    # Mostrar tabla
+    # Mostrar
     datatable = ft.DataTable(
         columns=[
             ft.DataColumn(label=ft.Text("Código")),
@@ -120,6 +114,7 @@ def main(page: ft.Page):
             for p in proveedores
         ]
         mostrar_mensaje("Proveedores cargados correctamente")
+        page.update()
 
     # Actualizar
     actualizar_fields = {
@@ -133,12 +128,10 @@ def main(page: ft.Page):
 
     def actualizar_proveedor(e):
         data = {k: v.value if v.value != "" else None for k, v in actualizar_fields.items()}
-
         valid, msg = validar_campos(data, es_actualizar=True)
         if not valid:
             mostrar_mensaje(msg, success=False)
             return
-
         success, msg = ProveedorCRUD.actualizar_proveedor(**data)
         mostrar_mensaje(msg, success)
 
@@ -152,13 +145,17 @@ def main(page: ft.Page):
         else:
             mostrar_mensaje("Selecciona un proveedor para eliminar.", success=False)
 
-    # UI
-    page.add(
+    # UI Principal
+    return ft.View(
+        route="/proveedor",
+        controls=[
+            
         ft.Container(
             padding=20,
             alignment=ft.alignment.center,
             content=ft.Column(
                 [
+
                     ft.Text("Sistema de Gestión de Proveedores", size=30, weight="bold", color="indigo", text_align="center"),
                     ft.Text("Interfaz para administrar la base de datos de proveedores", color="grey", text_align="center"),
 
@@ -224,7 +221,5 @@ def main(page: ft.Page):
                 expand=True
             )
         )
+        ]
     )
-
-
-ft.app(target=main)

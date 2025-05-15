@@ -184,7 +184,10 @@ def main(page: ft.Page):
             mostrar_mensaje(f"Error al eliminar vendedor: {ex}", success=False)
 
     # UI
-    page.add(
+    return ft.View(
+        route="/producto",
+        controls=[
+
         ft.Container(
             padding=20,
             alignment=ft.alignment.center,
@@ -255,7 +258,7 @@ def main(page: ft.Page):
                 expand=True
             )
         )
+        ]
     )
 
 
-ft.app(target=main)

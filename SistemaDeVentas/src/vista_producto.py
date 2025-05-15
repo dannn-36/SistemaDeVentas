@@ -157,7 +157,10 @@ def main(page: ft.Page):
             mostrar_mensaje("Selecciona un producto para eliminar.", success=False)
 
     # UI general
-    page.add(
+    return ft.View(
+        route="/producto",
+        controls=[
+            
         ft.Container(
             padding=20,
             alignment=ft.alignment.center,
@@ -228,7 +231,8 @@ def main(page: ft.Page):
                 expand=True
             )
         )
+        ]
     )
 
 
-ft.app(target=main)
+
