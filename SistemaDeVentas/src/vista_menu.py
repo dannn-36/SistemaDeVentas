@@ -41,7 +41,7 @@ def main(page: ft.Page):
                                     ft.ElevatedButton("🏢 Ir a Abastecimiento", icon=ft.Icons.WAREHOUSE, style=button_style, on_click=lambda _: page.go("/abastecimiento")),
                                     ft.ElevatedButton("🏙️ Ir a Distritos", icon=ft.Icons.LOCATION_CITY, style=button_style, on_click=lambda _: page.go("/distrito")),
                                     ft.ElevatedButton("👥 Ir a Clientes", icon=ft.Icons.PERSON, style=button_style, on_click=lambda _: page.go("/cliente")),
-                                    ft.ElevatedButton("❌ Salir", color = "red", icon=ft.Icons.EXIT_TO_APP, style=button_style, on_click=lambda _: sys.exit()),
+                                    ft.ElevatedButton("❌ Salir", icon=ft.Icons.EXIT_TO_APP, style=button_style, on_click=lambda _: sys.exit()),
                                     #no funciona esta funcion de arriba 
                                 ],
                                 alignment=ft.MainAxisAlignment.CENTER,
