@@ -11,6 +11,9 @@ from vista_detalle_compra import main as vista_detalle_compra
 from vista_abastecimiento import main as vista_abastecimiento
 from vista_distrito import main as vista_distrito
 from vista_cliente import main as vista_cliente
+from vista_menu_reportes import vista_menu_reportes
+from vista_reporte_auditoria import vista_reporte_auditoria
+from vista_reporte_empleados import vista_reporte_empleados
 
 def main(page: ft.Page):
     page.title = "Sistema de Ventas"
@@ -45,6 +48,12 @@ def main(page: ft.Page):
             page.views.append(vista_distrito(page))
         elif page.route == "/cliente":
             page.views.append(vista_cliente(page))
+        elif page.route == "/reportes":
+            page.views.append(vista_menu_reportes(page))
+        elif page.route == "/reporte_auditoria":
+            page.views.append(vista_reporte_auditoria(page))
+        elif page.route == "/reporte_empleados":
+            page.views.append(vista_reporte_empleados(page))
         page.update()
 
 
