@@ -61,7 +61,13 @@ def main(page: ft.Page):
 
         if not es_actualizar or data.get("cod_cli"):
             if not data["cod_cli"] or not data["cod_cli"].startswith("C") or not data["cod_cli"][1:].isdigit():
-                return False, "Código de cliente inválido. Debe comenzar con 'C' seguido de números (ej: C01)."
+                return False, "Código de cliente inválido. Debe comenzar con 'C' seguido de números (ej: C001)."
+            if len(data["cod_cli"][1:]) < 3:
+                return False, "El código de cliente debe tener al menos 3 caracteres numéricos después de 'C' (ej: C001)."
+            # Verificar si el código de cliente ya existe
+            codigos_existentes = [c[0] for c in ClienteCRUD.mostrar_clientes()]
+            if data["cod_cli"] in codigos_existentes:
+                return False, "El código de cliente ya existe. Por favor, utiliza un código único."
 
         if not es_actualizar or data.get("rso_cli"):
             if not data["rso_cli"]:
@@ -91,7 +97,7 @@ def main(page: ft.Page):
 
     # Campos agregar
     agregar_fields = {
-        'cod_cli': ft.TextField(label="Código del cliente (ej: C01)"),
+        'cod_cli': ft.TextField(label="Código del cliente (ej: C001)"),
         'rso_cli': ft.TextField(label="Razón Social"),
         'dir_cli': ft.TextField(label="Dirección"),
         'tlf_cli': ft.TextField(label="Teléfono"),
@@ -149,7 +155,7 @@ def main(page: ft.Page):
 
     # Actualizar
     actualizar_fields = {
-        'cod_cli': ft.TextField(label="Código del cliente a actualizar (ej: C01)"),
+        'cod_cli': ft.TextField(label="Código del cliente a actualizar (ej: C001)"),
         'rso_cli': ft.TextField(label="Nueva razón social (dejar vacío para omitir)"),
         'dir_cli': ft.TextField(label="Nueva dirección (dejar vacío para omitir)"),
         'tlf_cli': ft.TextField(label="Nuevo teléfono (dejar vacío para omitir)"),

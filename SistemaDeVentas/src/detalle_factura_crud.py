@@ -30,7 +30,41 @@ class DetalleFacturaCRUD:
                 conexion.close()
 
     @staticmethod
+    def verificar_existencia_factura(num_fac):
+        try:
+            conexion = DatabaseConnection.conexionBaseDeDatos()
+            cursor = conexion.cursor()
+            cursor.execute("SELECT 1 FROM FACTURA WHERE NUM_FAC = %s", (num_fac,))
+            return cursor.fetchone() is not None
+        except Exception:
+            return False
+        finally:
+            if conexion.is_connected():
+                cursor.close()
+                conexion.close()
+
+    @staticmethod
+    def verificar_existencia_producto(cod_pro):
+        try:
+            conexion = DatabaseConnection.conexionBaseDeDatos()
+            cursor = conexion.cursor()
+            cursor.execute("SELECT 1 FROM PRODUCTO WHERE COD_PRO = %s", (cod_pro,))
+            return cursor.fetchone() is not None
+        except Exception:
+            return False
+        finally:
+            if conexion.is_connected():
+                cursor.close()
+                conexion.close()
+
+    @staticmethod
     def insertar_detalle_factura(num_fac, cod_pro, can_ven, pre_ven):
+        # Verificar existencia de factura y producto
+        if not DetalleFacturaCRUD.verificar_existencia_factura(num_fac):
+            return False, "El número de factura no existe en la base de datos."
+        if not DetalleFacturaCRUD.verificar_existencia_producto(cod_pro):
+            return False, "El código de producto no existe en la base de datos."
+
         valid, msg = DetalleFacturaCRUD.validar_detalle_factura(num_fac, cod_pro, can_ven, pre_ven)
         if not valid:
             return False, msg
@@ -54,6 +88,12 @@ class DetalleFacturaCRUD:
 
     @staticmethod
     def actualizar_detalle_factura(num_fac, cod_pro, can_ven=None, pre_ven=None):
+        # Verificar existencia de factura y producto
+        if not DetalleFacturaCRUD.verificar_existencia_factura(num_fac):
+            return False, "El número de factura no existe en la base de datos."
+        if not DetalleFacturaCRUD.verificar_existencia_producto(cod_pro):
+            return False, "El código de producto no existe en la base de datos."
+
         if can_ven or pre_ven:
             valid, msg = DetalleFacturaCRUD.validar_detalle_factura(num_fac, cod_pro, can_ven or 1, pre_ven or 1.0)
             if not valid:
