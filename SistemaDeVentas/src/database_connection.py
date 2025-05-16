@@ -2,8 +2,7 @@ import mysql.connector
 
 class DatabaseConnection:
     # Valores por defecto
-    user = 'root'
-    password = '2852'
+  
     host = 'localhost'
     port = 3306
     database = 'sistemadeventas'
@@ -16,6 +15,7 @@ class DatabaseConnection:
     @staticmethod
     def conexionBaseDeDatos():
         try:
+            
             conexion = mysql.connector.connect(
                 user=DatabaseConnection.user,
                 password=DatabaseConnection.password,
