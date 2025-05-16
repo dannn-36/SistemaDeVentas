@@ -39,8 +39,12 @@ def main(page: ft.Page):
 
     def validar_campos(data, es_actualizar=False):
         if not es_actualizar or data.get("cod_pro"):
-            if not data["cod_pro"] or not data["cod_pro"].startswith("P") or not data["cod_pro"][1:].isdigit():
-                return False, "Código inválido. Debe comenzar con 'P' seguido de números (ej: P01)."
+            cod = data["cod_pro"]
+            # Cambiado: ahora requiere "P" seguido de al menos 3 dígitos
+            if not cod or not (cod.startswith("P") and cod[1:].isdigit() and len(cod[1:]) >= 3):
+                return False, "Código inválido. Debe comenzar con 'P' seguido de al menos 3 números (ej: P001)."
+            if not es_actualizar and ProductoCRUD.existe_producto(cod):
+                return False, f"El producto con código '{cod}' ya existe en la base de datos."
 
         if not es_actualizar or data.get("des_pro"):
             if not data["des_pro"]:
@@ -65,24 +69,25 @@ def main(page: ft.Page):
                 return False, "Stock mínimo debe ser un número entero."
 
         if not es_actualizar or data.get("uni_pro"):
-            if not data["uni_pro"]:
-                return False, "La unidad no puede estar vacía."
+            if not data["uni_pro"].isalpha():
+                return False, "Unidad inválida. Debe contener solo letras."
 
         if not es_actualizar or data.get("lin_pro"):
-            if not data["lin_pro"]:
-                return False, "La línea del producto no puede estar vacía."
+            if not data["lin_pro"].isdigit():
+                return False, "Línea inválida. Debe contener solo números."
 
         if not es_actualizar or data.get("imp_pro"):
-            try:
-                float(data["imp_pro"])
-            except:
-                return False, "Impuesto inválido. Debe ser un número."
+            if data["imp_pro"] not in ["V", "F"]:
+                return False, "Impuesto inválido. Debe ser 'V' (verdadero) o 'F' (falso)."
 
+        # Ensure the function always returns a tuple
         return True, ""
 
+    # Example usage in a function (replace or integrate as needed)
+ 
     # Campos agregar
     agregar_fields = {
-        'cod_pro': ft.TextField(label="Código del producto (ej: P01)"),
+        'cod_pro': ft.TextField(label="Código del producto (ej: P001)"),
         'des_pro': ft.TextField(label="Descripción"),
         'pre_pro': ft.TextField(label="Precio"),
         'sac_pro': ft.TextField(label="Stock actual"),
@@ -128,7 +133,7 @@ def main(page: ft.Page):
 
     # Campos actualizar
     actualizar_fields = {
-        'cod_pro': ft.TextField(label="Código del producto a actualizar (ej: P01)"),
+        'cod_pro': ft.TextField(label="Código del producto a actualizar (ej: P001)"),
         'des_pro': ft.TextField(label="Nueva descripción (dejar vacío para omitir)"),
         'pre_pro': ft.TextField(label="Nuevo precio"),
         'sac_pro': ft.TextField(label="Nuevo stock actual"),
@@ -250,7 +255,8 @@ def main(page: ft.Page):
         )
         ]
     )
- 
+
+
 
 
 

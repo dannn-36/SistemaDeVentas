@@ -112,3 +112,19 @@ class ProductoCRUD:
                 cursor.close()
                 conexion.close()
 
+    @staticmethod
+    def existe_producto(cod_pro):
+        try:
+            conexion = DatabaseConnection.conexionBaseDeDatos()
+            cursor = conexion.cursor()
+            query = "SELECT COUNT(*) FROM PRODUCTO WHERE COD_PRO = %s"
+            cursor.execute(query, (cod_pro,))
+            result = cursor.fetchone()
+            return result[0] > 0
+        except mysql.connector.Error as error:
+            return False
+        finally:
+            if conexion.is_connected():
+                cursor.close()
+                conexion.close()
+

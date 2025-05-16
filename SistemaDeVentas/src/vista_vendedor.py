@@ -72,8 +72,8 @@ def main(page: ft.Page):
                 return False, "El sueldo debe contener solo números sin puntos ni comas."
 
         if not es_actualizar or data.get("cod_ven"):
-            if not data["cod_ven"] or not data["cod_ven"].startswith("V") or not data["cod_ven"][1:].isdigit():
-                return False, "Código de vendedor inválido. Debe comenzar con 'V' seguido de números (ej: V11)."
+            if not data["cod_ven"] or not data["cod_ven"].startswith("V") or not data["cod_ven"][1:].isdigit() or len(data["cod_ven"][1:]) < 2:
+                return False, "Código de vendedor inválido. Debe comenzar con 'V' seguido de al menos 2 números (ej: V11)."
             # Validar código repetido
             if not es_actualizar and any(v[0] == data["cod_ven"] for v in VendedorCRUD.mostrar_vendedores()):
                 return False, "El código de vendedor ya existe. Por favor, elige otro."

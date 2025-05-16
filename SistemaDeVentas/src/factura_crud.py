@@ -46,6 +46,38 @@ class FacturaCRUD:
                 conexion.close()
 
     @staticmethod
+    def existe_factura(num_fac):
+        try:
+            conexion = DatabaseConnection.conexionBaseDeDatos()
+            cursor = conexion.cursor()
+            query = "SELECT COUNT(*) FROM FACTURA WHERE NUM_FAC = %s"
+            cursor.execute(query, (num_fac,))
+            result = cursor.fetchone()
+            return result[0] > 0
+        except Exception as error:
+            raise Exception(f"Error al verificar el número de factura: {error}")
+        finally:
+            if conexion.is_connected():
+                cursor.close()
+                conexion.close()
+
+    @staticmethod
+    def existe_cliente(cod_cli):
+        try:
+            conexion = DatabaseConnection.conexionBaseDeDatos()
+            cursor = conexion.cursor()
+            query = "SELECT COUNT(*) FROM CLIENTE WHERE COD_CLI = %s"
+            cursor.execute(query, (cod_cli,))
+            result = cursor.fetchone()
+            return result[0] > 0
+        except Exception as error:
+            raise Exception(f"Error al verificar el código de cliente: {error}")
+        finally:
+            if conexion.is_connected():
+                cursor.close()
+                conexion.close()
+
+    @staticmethod
     def listar_facturas():
         try:
             conexion = DatabaseConnection.conexionBaseDeDatos()
@@ -62,6 +94,11 @@ class FacturaCRUD:
 
     @staticmethod
     def insertar_factura(num_fac, fec_fac, cod_cli, fec_can, est_fac, cod_ven, por_igv=0.19):
+        # Check for duplicate factura and valid client code
+        if FacturaCRUD.existe_factura(num_fac):
+            return False, f"Error: El número de factura '{num_fac}' ya existe. Por favor, utiliza un número diferente."
+        if not FacturaCRUD.existe_cliente(cod_cli):
+            return False, f"Error: El código de cliente '{cod_cli}' no existe en la base de datos. Verifica el código ingresado."
         valid, msg = FacturaCRUD.validar_factura(num_fac, fec_fac, cod_cli, fec_can, est_fac, cod_ven, por_igv)
         if not valid:
             return False, msg

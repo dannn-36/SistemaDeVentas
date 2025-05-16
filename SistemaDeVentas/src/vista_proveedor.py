@@ -40,8 +40,14 @@ def main(page: ft.Page):
 
     def validar_campos(data, es_actualizar=False):
         if not es_actualizar or data.get("cod_prv"):
-            if not data["cod_prv"] or not data["cod_prv"].startswith("PR") or not data["cod_prv"][2:].isdigit():
-                return False, "Código de proveedor inválido. Debe comenzar con 'PR' seguido de números (ej: PR01)."
+            # Cambiar la validación para requerir al menos 2 dígitos después de "PR"
+            if (
+                not data["cod_prv"]
+                or not data["cod_prv"].startswith("PR")
+                or not data["cod_prv"][2:].isdigit()
+                or len(data["cod_prv"][2:]) < 2
+            ):
+                return False, "Código de proveedor inválido. Debe comenzar con 'PR' seguido de al menos dos números (ej: PR01)."
             if not es_actualizar:
                 success, msg = ProveedorCRUD.agregar_proveedor(data["cod_prv"], None, None, None, None, None)
                 if not success and "ya existe" in msg:
