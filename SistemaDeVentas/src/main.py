@@ -68,3 +68,9 @@ def main(page: ft.Page):
 if __name__ == "__main__":
     ft.app(target=main)
 
+
+#Proyecto final de la materia de Bases de Datos II
+# Integrantes:
+# - Daniel Villamil
+# - Sebastian Pineda
+# - Gianfranco Peniche
