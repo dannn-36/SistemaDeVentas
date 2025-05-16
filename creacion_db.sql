@@ -132,3 +132,13 @@ GROUP BY
     V.COD_VEN, V.NOM_VEN, V.APE_VEN
 ORDER BY 
     TOTAL_VENTAS ASC;
+
+
+    CREATE USER 'usuario1'@'localhost' IDENTIFIED BY '12345';
+GRANT SELECT, INSERT, UPDATE, DELETE ON sistemadeventas.* TO 'usuario1'@'localhost';
+
+CREATE USER 'usuario2'@'localhost' IDENTIFIED BY '12345';
+GRANT SELECT, INSERT, UPDATE, DELETE ON sistemadeventas.* TO 'usuario2'@'localhost';
+
+CREATE USER 'usuario3'@'localhost' IDENTIFIED BY '12345';
+GRANT SELECT, INSERT, UPDATE, DELETE ON sistemadeventas.* TO 'usuario3'@'localhost';
