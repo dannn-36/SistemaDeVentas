@@ -162,7 +162,15 @@ def main(page: ft.Page):
                         content=ft.Column([
                             ft.Text("Lista de Detalles de Compra", size=20, weight="semi-bold", color="indigo", text_align="center"),
                             ft.ElevatedButton("Cargar Detalles", on_click=cargar_detalles, bgcolor="indigo", color="white"),
-                            datatable
+                            ft.Container(
+                                ft.Column(
+                                    [datatable],
+                                    scroll="auto",
+                                    expand=True,
+                                ),
+                                height=400,
+                                expand=True,
+                            )
                         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER)
                     ),
 
