@@ -104,3 +104,33 @@ class AbastecimientoCRUD:
             if conexion.is_connected():
                 cursor.close()
                 conexion.close()
+
+    @staticmethod
+    def obtener_codigos_proveedores():
+        try:
+            conexion = DatabaseConnection.conexionBaseDeDatos()
+            cursor = conexion.cursor()
+            cursor.execute("SELECT COD_PRV FROM PROVEEDOR")
+            proveedores = [row[0] for row in cursor.fetchall()]
+            return proveedores
+        except mysql.connector.Error as error:
+            return []
+        finally:
+            if conexion.is_connected():
+                cursor.close()
+                conexion.close()
+
+    @staticmethod
+    def obtener_codigos_productos():
+        try:
+            conexion = DatabaseConnection.conexionBaseDeDatos()
+            cursor = conexion.cursor()
+            cursor.execute("SELECT COD_PRO FROM PRODUCTO")
+            productos = [row[0] for row in cursor.fetchall()]
+            return productos
+        except mysql.connector.Error as error:
+            return []
+        finally:
+            if conexion.is_connected():
+                cursor.close()
+                conexion.close()

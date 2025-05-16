@@ -54,6 +54,18 @@ def main(page: ft.Page):
                 mostrar_mensaje("El precio debe ser un número sin puntos ni comas.", success=False)
                 return
 
+            # Verificar si el proveedor existe
+            proveedores_existentes = AbastecimientoCRUD.obtener_codigos_proveedores()
+            if data["cod_prv"] not in proveedores_existentes:
+                mostrar_mensaje("El código de proveedor no existe. Por favor, verifica el código.", success=False)
+                return
+
+            # Verificar si el producto existe
+            productos_existentes = AbastecimientoCRUD.obtener_codigos_productos()
+            if data["cod_pro"] not in productos_existentes:
+                mostrar_mensaje("El código de producto no existe. Por favor, verifica el código.", success=False)
+                return
+
             success, msg = AbastecimientoCRUD.insertar_abastecimiento(**data)
             mostrar_mensaje(msg, success)
             if success:
