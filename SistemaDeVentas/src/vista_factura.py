@@ -40,9 +40,9 @@ def main(page: ft.Page):
 
     # Campos agregar
     agregar_fields = {
-        'num_fac': ft.TextField(label="Número de factura"),
+        'num_fac': ft.TextField(label="Número de factura (Ejemplo: F001)"),
         'fec_fac': ft.TextField(label="Fecha de factura (YYYY-MM-DD)"),
-        'cod_cli': ft.TextField(label="Código del cliente"),
+        'cod_cli': ft.TextField(label="Código del cliente (Ejemplo: C001)"),
         'fec_can': ft.TextField(label="Fecha de cancelación (YYYY-MM-DD)"),
         'est_fac': ft.TextField(label="Estado de la factura"),
         'cod_ven': ft.TextField(label="Código del vendedor"),
@@ -87,9 +87,9 @@ def main(page: ft.Page):
 
     # Actualizar
     actualizar_fields = {
-        'num_fac': ft.TextField(label="Número de factura a actualizar"),
+        'num_fac': ft.TextField(label="Número de factura a actualizar (Ejemplo: F001)"),
         'fec_fac': ft.TextField(label="Nueva fecha de factura (YYYY-MM-DD)"),
-        'cod_cli': ft.TextField(label="Nuevo código del cliente"),
+        'cod_cli': ft.TextField(label="Nuevo código del cliente (Ejemplo: C001)"),
         'fec_can': ft.TextField(label="Nueva fecha de cancelación (YYYY-MM-DD)"),
         'est_fac': ft.TextField(label="Nuevo estado de la factura"),
         'cod_ven': ft.TextField(label="Nuevo código del vendedor"),

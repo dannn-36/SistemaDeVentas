@@ -37,10 +37,17 @@ def vista_reporte_auditoria(page: ft.Page):
         controls=[
             ft.Text("Reporte de Auditoría", size=28, weight="bold"),
             ft.Divider(),
-            ft.DataTable(
-                columns=columnas,
-                rows=filas,
+            ft.Column(
+                [
+                    ft.DataTable(
+                        columns=columnas,
+                        rows=filas,
+                        expand=True,
+                    )
+                ],
                 expand=True,
+                height=500,  # Puedes ajustar la altura
+                scroll=ft.ScrollMode.ALWAYS,
             ),
             ft.ElevatedButton(
                 "Volver al menú",

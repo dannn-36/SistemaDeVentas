@@ -68,3 +68,11 @@ def main(page: ft.Page):
 if __name__ == "__main__":
     ft.app(target=main)
 
+# Sistema de gestion de ventas
+
+# proyecto final bases de datos II
+# Integrantes:
+
+# - Daniel villamil
+# - Gianfranco Peniche
+# - Sebastian Pineda
